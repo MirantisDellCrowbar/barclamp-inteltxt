@@ -34,9 +34,11 @@ OAT_status(){
                         echo $"OAT (pid $pid) is running..."
                 else
                         echo $"OAT is stopped"
+                        return 1
                 fi
         else
                 echo $"OAT is stopped"
+                return 1
         fi
 }
 
@@ -90,6 +92,7 @@ restart() {
 status() {
         OAT_status
         RETURN=$?
+        return $RETURN
 }
 
 case "$1" in
