@@ -13,9 +13,9 @@
 # limitations under the License. 
 # 
 
-class OatController < BarclampController
+class InteltxtController < BarclampController
   def initialize
-    @service_object = OatService.new logger
+    @service_object = InteltxtService.new logger
   end
 end
 

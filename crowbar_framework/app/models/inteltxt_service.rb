@@ -13,16 +13,16 @@
 # limitations under the License. 
 # 
 
-class OatService < ServiceObject
+class InteltxtService < ServiceObject
 
   def initialize(thelogger)
-    @bc_name = "oat"
+    @bc_name = "inteltxt"
     @logger = thelogger
   end
 
   def proposal_dependencies(role)
     answer = []
-    answer << { "barclamp" => "mysql", "inst" => role.default_attributes["oat"]["mysql_instance"] }
+    answer << { "barclamp" => "mysql", "inst" => role.default_attributes["inteltxt"]["mysql_instance"] }
     answer
   end
   
@@ -30,18 +30,18 @@ class OatService < ServiceObject
   # def self.allow_multiple_proposals?
   
   def create_proposal
-    @logger.debug("Oat create_proposal: entering")
+    @logger.debug("Inteltxt create_proposal: entering")
     base = super
 
     nodes = NodeObject.all
     nodes.delete_if { |n| n.nil? or n.admin? }
     if nodes.size >= 1
-      base["deployment"]["oat"]["elements"] = {
+      base["deployment"]["inteltxt"]["elements"] = {
         "oat-server" => [ nodes.first[:fqdn] ]
       }
     end
 
-    base["attributes"]["oat"]["mysql_instance"] = ""
+    base["attributes"]["inteltxt"]["mysql_instance"] = ""
     begin
       mysqlService = MysqlService.new(@logger)
       # Look for active roles
@@ -50,22 +50,22 @@ class OatService < ServiceObject
         # No actives, look for proposals
         mysqls = mysqlService.proposals[1]
       end
-      base["attributes"]["oat"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
+      base["attributes"]["inteltxt"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
     rescue
-      @logger.info("Oat create_proposal: no mysql found")
+      @logger.info("Inteltxt create_proposal: no mysql found")
     end
     
 
-    @logger.debug("Oat create_proposal: exiting")
+    @logger.debug("Inteltxt create_proposal: exiting")
     base
   end
 
   def apply_role_pre_chef_call(old_role, role, all_nodes)
-    @logger.debug("Oat apply_role_pre_chef_call: entering #{all_nodes.inspect}")
+    @logger.debug("Inteltxt apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
-    om = old_role ? old_role.default_attributes["oat"] : {}
-    nm = role.default_attributes["oat"]
+    om = old_role ? old_role.default_attributes["inteltxt"] : {}
+    nm = role.default_attributes["inteltxt"]
     begin
       if om["db"]["password"]
         nm["db"]["password"] = om["db"]["password"]
@@ -76,7 +76,7 @@ class OatService < ServiceObject
       nm["db"]["password"] = random_password
     end
     role.save 
-    @logger.debug("Oat apply_role_pre_chef_call: leaving")
+    @logger.debug("Inteltxt apply_role_pre_chef_call: leaving")
   end
 
 end

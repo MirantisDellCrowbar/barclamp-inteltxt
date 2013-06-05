@@ -2,13 +2,13 @@
   "type": "map",
   "required": true,
   "mapping": {
-    "id": { "type": "str", "required": true, "pattern": "/^bc-oat-|^bc-template-oat$/" },
+    "id": { "type": "str", "required": true, "pattern": "/^bc-inteltxt-|^bc-template-inteltxt$/" },
     "description": { "type": "str", "required": true },
     "attributes": {
       "type": "map",
       "required": true,
       "mapping": {
-        "oat": {
+        "inteltxt": {
           "type": "map",
           "required": true,
           "mapping": {
@@ -42,7 +42,7 @@
       "type": "map",
       "required": true,
       "mapping": {
-        "oat": {
+        "inteltxt": {
           "type": "map",
           "required": true,
           "mapping": {
