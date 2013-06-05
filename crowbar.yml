@@ -22,9 +22,9 @@
 #    debs/rpms/gems: components needs by the barclamp
 
 barclamp:
-  name: oat
-  display: Oat
-  description: A way to maximize awesomeness for Oat
+  name: inteltxt
+  display: Intel TXT
+  description: A way to maximize awesomeness for Intel TXT
   proposal_schema_version: 1
   user_managed: true
   version: 0
@@ -79,7 +79,7 @@ locale_additions:
     nav:
       oat: OAT
     barclamp:
-      oat:
+      inteltxt:
         edit_attributes:
           attributes: Attributes
           oat_service_settings: OpenAttestation service settings
