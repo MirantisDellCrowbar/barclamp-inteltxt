@@ -17,9 +17,9 @@
 #  action :install
 #end
 
-#template node[:oat][:config_file] do
+#template node[:inteltxt][:config_file] do
 #  source "oat.conf.erb"
-#  owner node[:oat][:user]
+#  owner node[:inteltxt][:user]
 #  group "root"
 #  mode 0644
 #end

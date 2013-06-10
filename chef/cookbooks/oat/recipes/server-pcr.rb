@@ -8,17 +8,17 @@ block do
 server = search(:node, "roles:oat-server") || []
 address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(server.first, "admin").address
 #address=server.first.fqdn
-url = "http#{"s"if node[:oat][:server][:secure]}://#{address}:#{node[:oat][:server][:port]}"
+url = "http#{"s"if node[:inteltxt][:server][:secure]}://#{address}:#{node[:inteltxt][:server][:port]}"
 #configure OATClient
 
 #search all agents
 agents = search(:node, "recipes:oat\\:\\:client") || []
 if agents.size > 0
-OATClient::config url, node[:oat][:server][:secret], :retries => 5, :wait => 2
+OATClient::config url, node[:inteltxt][:server][:secret], :retries => 5, :wait => 2
 end
 
 agents.each do |agent|
-  if agent[:oat][:pcr].size == 0
+  if agent[:inteltxt][:pcr].size == 0
     next
   end
   #add all the agents into oat
@@ -74,7 +74,7 @@ agents.each do |agent|
   else
     (0..7).each do |n|
       #####whitelist pcr with mle_oem_name mle_oem_version oem_name#####
-      mle_oem.add_manifest(:name => n.to_s, :value => agent[:oat][:pcr][n.to_s].strip)
+      mle_oem.add_manifest(:name => n.to_s, :value => agent[:inteltxt][:pcr][n.to_s].strip)
       Chef::Log.info("PCR #{n} for MLE #{mle_oem_type} #{mle_oem_name} #{mle_oem_version} has been added")
     end
     Chef::Log.info("MLE #{mle_oem_type} #{mle_oem_name} #{mle_oem_version} has been created") if mle_oem.save
@@ -101,7 +101,7 @@ agents.each do |agent|
   else
 
     (17..19).each do |n|
-      mle_vmm.add_manifest(:name => n.to_s, :value => agent[:oat][:pcr][n.to_s].strip)
+      mle_vmm.add_manifest(:name => n.to_s, :value => agent[:inteltxt][:pcr][n.to_s].strip)
       Chef::Log.info("PCR #{n} for MLE #{mle_vmm_type} #{mle_vmm_name} #{mle_vmm_version} has been added")
     end
     Chef::Log.info("MLE #{mle_vmm_type} #{mle_vmm_name} #{mle_vmm_version} has been created") if mle_vmm.save

@@ -11,7 +11,7 @@ define :oat_service do
     end
     supports :status => true, :restart => true
     action [:enable, :start]
-    subscribes :restart, resources(:template => node[:oat][:config_file])
+    subscribes :restart, resources(:template => node[:inteltxt][:config_file])
   end
 
 end

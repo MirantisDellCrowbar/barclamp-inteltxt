@@ -10,7 +10,7 @@ include_recipe "#{@cookbook_name}::common"
 #  user "root"
 #  code <<-EOH
 #	mkdir -p /var/lib/oat/
-#	curl #{node[:oat][:tty_linux_image]} | tar xvz -C /tmp/
+#	curl #{node[:inteltxt][:tty_linux_image]} | tar xvz -C /tmp/
 #	touch /var/lib/oat/tty_setup
 #  EOH
 #  not_if do File.exists?("/var/lib/oat/tty_setup") end

@@ -13,17 +13,17 @@
 # limitations under the License.
 #
 
-override[:oat][:user]="oat"
+override[:inteltxt][:user]="oat"
 
 # declare what needs to be monitored
-default[:oat][:monitor]={}
-default[:oat][:monitor][:svcs] = []
-default[:oat][:monitor][:ports]={}
-default[:oat][:owner_auth]=""
-default[:oat][:pcr]={}
+default[:inteltxt][:monitor]={}
+default[:inteltxt][:monitor][:svcs] = []
+default[:inteltxt][:monitor][:ports]={}
+default[:inteltxt][:owner_auth]=""
+default[:inteltxt][:pcr]={}
 
-default[:oat][:server][:port] = 8443
-default[:oat][:server][:secure] = true
-default[:oat][:server][:secret] = nil
-default[:oat][:server][:client_package_ready] = false
+default[:inteltxt][:server][:port] = 8443
+default[:inteltxt][:server][:secure] = true
+default[:inteltxt][:server][:secret] = nil
+default[:inteltxt][:server][:client_package_ready] = false
 

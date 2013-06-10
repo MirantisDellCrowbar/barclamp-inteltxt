@@ -14,7 +14,7 @@ Chef::Log.info("Configuring OAT to use MySQL backend")
 
 include_recipe "mysql::client"
 
-env_filter = " AND mysql_config_environment:mysql-config-#{node[:oat][:mysql_instance]}"
+env_filter = " AND mysql_config_environment:mysql-config-#{node[:inteltxt][:mysql_instance]}"
 mysqls = search(:node, "roles:mysql-server#{env_filter}") || []
 if mysqls.length > 0
     mysql = mysqls[0]
@@ -26,21 +26,21 @@ end
 mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
 Chef::Log.info("Mysql server found at #{mysql_address}")
 
-mysql_database "create #{node[:oat][:db][:database]} oat database" do
+mysql_database "create #{node[:inteltxt][:db][:database]} oat database" do
     host    mysql_address
     username "db_maker"
     password mysql[:mysql][:db_maker_password]
-    database node[:oat][:db][:database]
+    database node[:inteltxt][:db][:database]
     action :create_db
 end
 
-mysql_database "create oat database user #{node[:oat][:db][:user]}" do
+mysql_database "create oat database user #{node[:inteltxt][:db][:user]}" do
     host    mysql_address
     username "db_maker"
     password mysql[:mysql][:db_maker_password]
-    database node[:oat][:db][:database]
+    database node[:inteltxt][:db][:database]
     action :query
-    sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON #{node[:oat][:db][:database]}.* to '#{node[:oat][:db][:user]}'@'%' IDENTIFIED BY '#{node[:oat][:db][:password]}';"
+    sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON #{node[:inteltxt][:db][:database]}.* to '#{node[:inteltxt][:db][:user]}'@'%' IDENTIFIED BY '#{node[:inteltxt][:db][:password]}';"
 end
 
 # installing package
@@ -89,7 +89,7 @@ end
 
 [ "oat_db.MySQL", "init.sql" ].each do |f|
   execute "create_tables_for_oat" do
-    command "mysql -u #{node[:oat][:db][:user]} -p#{node[:oat][:db][:password]} -h #{mysql_address} #{node[:oat][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
+    command "mysql -u #{node[:inteltxt][:db][:user]} -p#{node[:inteltxt][:db][:password]} -h #{mysql_address} #{node[:inteltxt][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
     ignore_failure true
     action :nothing
     subscribes :run, "execute[unzip_OAT_Setup]", :immediately
@@ -102,8 +102,8 @@ execute "add_hostname_to_host" do
   not_if "grep `hostname` /etc/hosts"
 end
 
-node.set_unless[:oat][:keystore_pass] = secure_password
-node.set_unless[:oat][:truststore_pass] = secure_password
+node.set_unless[:inteltxt][:keystore_pass] = secure_password
+node.set_unless[:inteltxt][:truststore_pass] = secure_password
 
 bash "create_keystore_and_truststore" do
   cwd "/var/lib/oat-appraiser/Certificate"
@@ -117,8 +117,8 @@ bash "create_keystore_and_truststore" do
   keytool -import -keystore $truststore -storepass $truststore_pass -file hostname.cer -noprompt
   EOH
   environment({
-    'p12pass' => node[:oat][:keystore_pass],
-    'truststore_pass' => node[:oat][:truststore_pass],
+    'p12pass' => node[:inteltxt][:keystore_pass],
+    'truststore_pass' => node[:inteltxt][:truststore_pass],
     'p12file' => 'internal.p12',
     'keystore' => 'keystore.jks',
     'truststore' => 'TrustStore.jks'
@@ -141,9 +141,9 @@ webapp_dir = "/usr/share/oat-appraiser/webapps"
     variables({
       :resource_name => webapp,
       :webapp_path => webapp_dir,
-      :db_user => node[:oat][:db][:user],
-      :db_pass => node[:oat][:db][:password],
-      :db_name => node[:oat][:db][:database],
+      :db_user => node[:inteltxt][:db][:user],
+      :db_pass => node[:inteltxt][:db][:password],
+      :db_name => node[:inteltxt][:db][:database],
       :mysql_host => mysql_address
     })
   end
@@ -231,7 +231,7 @@ service "tomcat6" do
   subscribes :restart, "template[/etc/oat-appraiser/OAT.properties]", :immediately
 end
 
-node[:apache][:listen_ports] << node[:oat][:apache_listen_port] unless node[:apache][:listen_ports].include? node[:oat][:apache_listen_port]
+node[:apache][:listen_ports] << node[:inteltxt][:apache_listen_port] unless node[:apache][:listen_ports].include? node[:inteltxt][:apache_listen_port]
 include_recipe "apache2"
 
 template "#{node[:apache][:dir]}/sites-available/oat_vhost" do
@@ -265,9 +265,9 @@ end
 template "/var/www/OAT/includes/dbconnect.php" do
   source "dbconnect.php.erb"
   variables(
-    :db_user => node[:oat][:db][:user],
-    :db_pass => node[:oat][:db][:password],
-    :db_name => node[:oat][:db][:database],
+    :db_user => node[:inteltxt][:db][:user],
+    :db_pass => node[:inteltxt][:db][:password],
+    :db_name => node[:inteltxt][:db][:database],
     :db_host => mysql_address
   )
   notifies :restart, "service[apache2]"  
@@ -308,7 +308,7 @@ end
 # appraiser will create PrivacyCA only after successful startup
 ruby_block "set_client_package_ready" do
   block do
-    node.set[:oat][:server][:client_package_ready] = true
+    node.set[:inteltxt][:server][:client_package_ready] = true
     node.save
   end
   action :nothing

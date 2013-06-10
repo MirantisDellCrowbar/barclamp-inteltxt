@@ -20,10 +20,10 @@
 # if monitored by nagios, install the nrpe commands
 
 # Node addresses are dynamic and can't be set from attributes only.
-node[:oat][:monitor][:ports]["oat-api"] = [node[:oat][:api_bind_host], node[:oat][:api_bind_port]]
+node[:inteltxt][:monitor][:ports]["oat-api"] = [node[:inteltxt][:api_bind_host], node[:inteltxt][:api_bind_port]]
 
-svcs = node[:oat][:monitor][:svcs]
-ports = node[:oat][:monitor][:ports]
+svcs = node[:inteltxt][:monitor][:svcs]
+ports = node[:inteltxt][:monitor][:ports]
 log ("will monitor oat svcs: #{svcs.join(',')} and ports #{ports.values.join(',')}")
 
 include_recipe "nagios::common" if node["roles"].include?("nagios-client")

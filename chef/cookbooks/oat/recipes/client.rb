@@ -14,7 +14,7 @@ oat_server =( search(:node, "roles:oat-server") || [] ).first
 include_recipe "oat::bios"
 include_recipe "oat::tboot"
 #if necesary (bios updated or tboot is installed or something)
-if tpm_active != 1 or tpm_enabled != 1 or not oat_server[:oat][:server][:client_package_ready]
+if tpm_active != 1 or tpm_enabled != 1 or not oat_server[:inteltxt][:server][:client_package_ready]
   return
 end
 include_recipe "oat::reboot"
@@ -41,8 +41,8 @@ end
 
 #install agent from remote oatapp
 #currently oat agent consists of a lot hardcoded path and so on, hope sometime oat will be properly packaged and released, but currently we have to install it in that way
-if node[:oat][:owner_auth]==""
-  node.set[:oat][:owner_auth]=(40.times.map{ rand(10) }).join
+if node[:inteltxt][:owner_auth]==""
+  node.set[:inteltxt][:owner_auth]=(40.times.map{ rand(10) }).join
   node.save
 end
 
@@ -50,7 +50,7 @@ end
 
 source=address = "#{oat_server[:fqdn]}"
 #Chef::Recipe::Barclamp::Inventory.get_network_by_type(oat_server, "admin").address
-port="#{oat_server[:oat][:apache_listen_port]}"
+port="#{oat_server[:inteltxt][:apache_listen_port]}"
 dist_name="ClientInstallForLinux.zip"
 contain="ClientInstallForLinux"
 clientpath="/usr/lib/OATClient/"
@@ -75,7 +75,7 @@ template "/tmp/#{contain}/OAT.properties" do
   source "OAT_agent.properties.erb"
   variables(
     :source => source,
-    :keyauth => node[:oat][:owner_auth],
+    :keyauth => node[:inteltxt][:owner_auth],
     :keyindex => "1"
   )
   not_if { ::File.exists?("/etc/init.d/OATClient") }
@@ -84,7 +84,7 @@ end
 template "/tmp/#{contain}/OATprovisioner.properties" do
   source "OATprovisioner.properties.erb"
   variables(
-    :keyauth => node[:oat][:owner_auth],
+    :keyauth => node[:inteltxt][:owner_auth],
     :keyindex => 1,
     :source => source,
     :clientpath => clientpath
@@ -98,8 +98,8 @@ execute "provisioning_node" do
   command <<-EOF
     cd #{contain}
     #clear tpm creds
-    #./NIARL_TPM_Module -mode 2 -owner_auth #{node[:oat][:owner_auth]} -cred_type EC
-    ./NIARL_TPM_Module -mode 14 -owner_auth #{node[:oat][:owner_auth]} -cred_type EC
+    #./NIARL_TPM_Module -mode 2 -owner_auth #{node[:inteltxt][:owner_auth]} -cred_type EC
+    ./NIARL_TPM_Module -mode 14 -owner_auth #{node[:inteltxt][:owner_auth]} -cred_type EC
     #some copy-and-paste of perfect oat code with an awesome solution
     export provclasspath=".:./lib/activation.jar:./lib/axis.jar:./lib/bcprov-jdk15-141.jar:./lib/commons-discovery-0.2.jar:./lib/commons-logging-1.0.4.jar:./lib/FastInfoset.jar:./lib/HisPrivacyCAWebServices-client.jar:./lib/HisPrivacyCAWebServices2-client.jar:./lib/HisWebServices-client.jar:./lib/http.jar:./lib/jaxb-api.jar:./lib/jaxb-impl.jar:./lib/jaxb-xjc.jar:./lib/jaxrpc.jar:./lib/jaxws-api.jar:./lib/jaxws-rt.jar:./lib/jaxws-tools.jar:./lib/jsr173_api.jar:./lib/jsr181-api.jar:./lib/jsr250-api.jar:./lib/mail.jar:./lib/mimepull.jar:./lib/PrivacyCA.jar:./lib/resolver.jar:./lib/saaj-api.jar:./lib/saaj-impl.jar:./lib/SALlib_hibernate3.jar:./lib/stax-ex.jar:./lib/streambuffer.jar:./lib/TSSCoreService.jar:./lib/woodstox.jar:./lib/wsdl4j-1.5.1.jar"
     java -cp $provclasspath gov.niarl.his.privacyca.HisTpmProvisioner
@@ -149,7 +149,7 @@ template "#{clientpath}/OAT.properties" do
   source "OAT_agent.properties.erb"
   variables(
     :source => source,
-    :keyauth => node[:oat][:owner_auth],
+    :keyauth => node[:inteltxt][:owner_auth],
     :keyindex => 1
   )
 end

@@ -9,7 +9,7 @@ ALERT_MASK_CSV=
 COMP_MASK=stmHash,xen.gz
 
 #PCR select for integrity reports
-PCR_SELECT=<%= node[:oat][:pcr_select_mask] %>
+PCR_SELECT=<%= node[:inteltxt][:pcr_select_mask] %>
 
 #############################################################################
 ####### Mail Properties
@@ -17,17 +17,17 @@ PCR_SELECT=<%= node[:oat][:pcr_select_mask] %>
 
 ####### Message Properties
 #message.to is a comma separated list of email addresses
-alert.message.to=<%= node[:oat][:alert_mail_to] %>
+alert.message.to=<%= node[:inteltxt][:alert_mail_to] %>
 alert.message.subject=OAT Alert Notification
 #message.body is a simple html email message (with the correct escape characters for a property)
 alert.message.body=An integrity alert has been triggered.  Please refer to the OAT portal for the OAT appraiser.  PLEASE DO NOT REPLY TO TOAT AUTOMATED MESSAGE.
 
 ####### JavaMail API Mail Properties
 mail.host=<%= node[:fqdn] %>
-mail.from=<%= node[:oat][:alert_mail_from] %>
-mail.user=<%= node[:oat][:alert_mail_user] %>
-mail.password=<%= node[:oat][:alert_mail_pass] %>
-mail.smtp.port=<%= node[:oat][:alert_mail_port] %>
-mail.smtp.host=<%= node[:oat][:alert_mail_host] %>
+mail.from=<%= node[:inteltxt][:alert_mail_from] %>
+mail.user=<%= node[:inteltxt][:alert_mail_user] %>
+mail.password=<%= node[:inteltxt][:alert_mail_pass] %>
+mail.smtp.port=<%= node[:inteltxt][:alert_mail_port] %>
+mail.smtp.host=<%= node[:inteltxt][:alert_mail_host] %>
 mail.smtp.auth=true
 mail.smtp.starttls.enable=true
