@@ -10,34 +10,34 @@ node.set_unless['oat']['db']['password'] = secure_password
 node.set_unless['oat']['password'] = secure_password
 
 # prepare db
-Chef::Log.info("Configuring OAT to use MySQL backend")
+Chef::Log.info("Configuring OAT to use database backend")
 
 include_recipe "mysql::client"
 
-env_filter = " AND mysql_config_environment:mysql-config-#{node[:oat][:mysql_instance]}"
-mysqls = search(:node, "roles:mysql-server#{env_filter}") || []
-if mysqls.length > 0
-    mysql = mysqls[0]
-    mysql = node if mysql.name == node.name
+env_filter = " AND database_config_environment:database-config-#{node[:oat][:database_instance]}"
+sqls = search(:node, "roles:database-server#{env_filter}") || []
+if sqls.length > 0
+    sql = sqls[0]
+    sql = node if sql.name == node.name
 else
-    mysql = node
+    sql = node
 end
 
-mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
-Chef::Log.info("Mysql server found at #{mysql_address}")
+sql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if sql_address.nil?
+Chef::Log.info("sql server found at #{sql_address}")
 
-mysql_database "create #{node[:oat][:db][:database]} oat database" do
-    host    mysql_address
+database "create #{node[:oat][:db][:database]} oat database" do
+    host    sql_address
     username "db_maker"
-    password mysql[:mysql][:db_maker_password]
+    password sql[:database][:db_maker_password]
     database node[:oat][:db][:database]
     action :create_db
 end
 
-mysql_database "create oat database user #{node[:oat][:db][:user]}" do
-    host    mysql_address
+database "create oat database user #{node[:oat][:db][:user]}" do
+    host    sql_address
     username "db_maker"
-    password mysql[:mysql][:db_maker_password]
+    password sql[:database][:db_maker_password]
     database node[:oat][:db][:database]
     action :query
     sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON #{node[:oat][:db][:database]}.* to '#{node[:oat][:db][:user]}'@'%' IDENTIFIED BY '#{node[:oat][:db][:password]}';"
@@ -89,7 +89,7 @@ end
 
 [ "oat_db.MySQL", "init.sql" ].each do |f|
   execute "create_tables_for_oat" do
-    command "mysql -u #{node[:oat][:db][:user]} -p#{node[:oat][:db][:password]} -h #{mysql_address} #{node[:oat][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
+    command "mysql -u #{node[:oat][:db][:user]} -p#{node[:oat][:db][:password]} -h #{sql_address} #{node[:oat][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
     ignore_failure true
     action :nothing
     subscribes :run, "execute[unzip_OAT_Setup]", :immediately
@@ -144,7 +144,7 @@ webapp_dir = "/usr/share/oat-appraiser/webapps"
       :db_user => node[:oat][:db][:user],
       :db_pass => node[:oat][:db][:password],
       :db_name => node[:oat][:db][:database],
-      :mysql_host => mysql_address
+      :mysql_host => sql_address
     })
   end
   execute "link_service_#{webapp}" do
@@ -268,7 +268,7 @@ template "/var/www/OAT/includes/dbconnect.php" do
     :db_user => node[:oat][:db][:user],
     :db_pass => node[:oat][:db][:password],
     :db_name => node[:oat][:db][:database],
-    :db_host => mysql_address
+    :db_host => sql_address
   )
   notifies :restart, "service[apache2]"  
 end
