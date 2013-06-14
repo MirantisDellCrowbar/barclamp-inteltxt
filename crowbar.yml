@@ -24,13 +24,13 @@
 barclamp:
   name: inteltxt
   display: Intel TXT
-  description: A way to maximize awesomeness for Intel TXT
+  description: Provide Intel Open Attestation service for openstack trusted computing pool
   proposal_schema_version: 1
   user_managed: true
   version: 0
   requires:
     - @crowbar
-    - mysql
+    - database
   member:
     - openstack
   os_support:
@@ -101,6 +101,6 @@ locale_additions:
           alert_mail_user: User
           alert_mail_pass: Password
           apache_listen_port: OAT HIS portal port
-          mysql_instance: MySQL
+          database_instance: Database
       oat_edit_deployment:
         deployment: Deployment

@@ -29,8 +29,8 @@
       %label{ :for => :db_settings }= t('.db_settings')
     %div.container
       %p
-        %label{ :for => :mysql_instance }= t('.mysql_instance')
-        = instance_selector("mysql", :mysql_instance, "mysql_instance", @proposal)
+        %label{ :for => :database_instance }= t('.database_instance')
+        = instance_selector("database", :database_instance, "database_instance", @proposal)
       %p
         %label{ :for => :db_user }= t('.db_user')
         %input#db_user{:type => "text", :name => "db_user", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["db"]["user"], :onchange => "update_value('db/user','user', 'string')"}
