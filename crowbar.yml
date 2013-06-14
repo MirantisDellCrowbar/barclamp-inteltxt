@@ -24,7 +24,7 @@
 barclamp:
   name: inteltxt
   display: Intel TXT
-  description: A way to maximize awesomeness for Intel TXT
+  description: Provide Intel Open Attestation service for openstack trusted computing pool
   proposal_schema_version: 1
   user_managed: true
   version: 0
