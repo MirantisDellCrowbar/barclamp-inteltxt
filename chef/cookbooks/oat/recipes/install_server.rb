@@ -334,5 +334,4 @@ ruby_block "set_client_package_ready" do
 end
 
 include_recipe "oat::server-pcr"
-include_recipe "oat::fill-flavors"
 node.save
