@@ -12,7 +12,7 @@
           "type": "map",
           "required": true,
           "mapping": {
-            "database_instance": { "type": "str", "required": true },
+            "mysql_instance": { "type": "str", "required": true },
             "apache_listen_port": { "type": "str", "required": true },
             "pcr_select_mask": { "type": "str", "required": true },
             "oa_attest_interval": { "type": "int", "required": true },

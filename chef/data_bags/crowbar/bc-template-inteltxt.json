@@ -20,7 +20,7 @@
       "alert_mail_pass": "smtp_pass",
       "alert_mail_port": 25,
       "alert_mail_host": "localhost",
-      "database_instance": "none"
+      "mysql_instance": "none"
     }
   },
   "deployment": {

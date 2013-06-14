@@ -28,7 +28,7 @@ begin
   query = Chef::Search::Query.new
 
   oat_server = query.search('node', 'roles:oat-server').first.first rescue raise("oat-server not found")
-  mysql_server = query.search('node', 'roles:database-server').first.first rescue raise("mysql-server not found")
+  mysql_server = query.search('node', 'roles:mysql-server').first.first rescue raise("mysql-server not found")
   oat_hostname=oat_server[:fqdn]
   oat_port=oat_server[:oat][:server][:port]
   oat_db_user=oat_server[:oat][:db][:user]
