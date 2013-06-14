@@ -22,7 +22,7 @@ class InteltxtService < ServiceObject
 
   def proposal_dependencies(role)
     answer = []
-    answer << { "barclamp" => "mysql", "inst" => role.default_attributes["inteltxt"]["mysql_instance"] }
+    answer << { "barclamp" => "database", "inst" => role.default_attributes["inteltxt"]["database_instance"] }
     answer
   end
   
@@ -41,18 +41,18 @@ class InteltxtService < ServiceObject
       }
     end
 
-    base["attributes"]["inteltxt"]["mysql_instance"] = ""
+    base["attributes"]["inteltxt"]["database_instance"] = ""
     begin
-      mysqlService = MysqlService.new(@logger)
+      databaseService = DatabaseService.new(@logger)
       # Look for active roles
-      mysqls = mysqlService.list_active[1]
-      if mysqls.empty?
+      databases = databaseService.list_active[1]
+      if databases.empty?
         # No actives, look for proposals
-        mysqls = mysqlService.proposals[1]
+        databases = databaseService.proposals[1]
       end
-      base["attributes"]["inteltxt"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
+      base["attributes"]["inteltxt"]["database_instance"] = databases[0] unless databases.empty?
     rescue
-      @logger.info("Inteltxt create_proposal: no mysql found")
+      @logger.info("Inteltxt create_proposal: no databases found")
     end
     
 

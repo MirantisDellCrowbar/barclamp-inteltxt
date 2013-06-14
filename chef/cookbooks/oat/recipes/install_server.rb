@@ -10,45 +10,63 @@ node.set_unless['inteltxt']['db']['password'] = secure_password
 node.set_unless['inteltxt']['password'] = secure_password
 
 # prepare db
-Chef::Log.info("Configuring OAT to use MySQL backend")
+Chef::Log.info("Configuring OAT to use database backend")
 
 include_recipe "mysql::client"
 
-env_filter = " AND mysql_config_environment:mysql-config-#{node[:inteltxt][:mysql_instance]}"
-mysqls = search(:node, "roles:mysql-server#{env_filter}") || []
-if mysqls.length > 0
-    mysql = mysqls[0]
-    mysql = node if mysql.name == node.name
+env_filter = " AND database_config_environment:database-config-#{node[:inteltxt][:database_instance]}"
+sqls = search(:node, "roles:database-server#{env_filter}") || []
+if sqls.length > 0
+    sql = sqls[0]
+    sql = node if sql.name == node.name
 else
-    mysql = node
+    sql = node
 end
 
-mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
-Chef::Log.info("Mysql server found at #{mysql_address}")
+sql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if sql_address.nil?
+Chef::Log.info("sql server found at #{sql_address}")
 
-mysql_database "create #{node[:inteltxt][:db][:database]} oat database" do
-    host    mysql_address
-    username "db_maker"
-    password mysql[:mysql][:db_maker_password]
-    database node[:inteltxt][:db][:database]
-    action :create_db
+db_conn = { :host => sql_address,
+            :username => "db_maker",
+            :password => sql[:database][:db_maker_password] }
+db_provider = Chef::Recipe::Database::Util.get_database_provider(sql)
+db_user_provider = Chef::Recipe::Database::Util.get_user_provider(sql)
+privs = Chef::Recipe::Database::Util.get_default_priviledges(sql)
+
+database "create #{node[:inteltxt][:db][:database]} oat database" do
+    connection db_conn
+    database_name node[:inteltxt][:db][:database]
+    action :create
+    provider db_provider
 end
 
-mysql_database "create oat database user #{node[:inteltxt][:db][:user]}" do
-    host    mysql_address
-    username "db_maker"
-    password mysql[:mysql][:db_maker_password]
-    database node[:inteltxt][:db][:database]
-    action :query
-    sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER ON #{node[:inteltxt][:db][:database]}.* to '#{node[:inteltxt][:db][:user]}'@'%' IDENTIFIED BY '#{node[:inteltxt][:db][:password]}';"
+database_user "create oat database user" do
+    host '%' 
+    connection db_conn
+    username node[:inteltxt][:db][:user]
+    password node[:inteltxt][:db][:password]
+    provider db_user_provider
+    action :create
 end
+
+database_user "grant database access for oat database user" do
+    connection db_conn
+    username node[:inteltxt][:db][:user]
+    password node[:inteltxt][:db][:password]
+    database_name node[:inteltxt][:db][:database]
+    host '%'
+    privileges privs
+    provider db_user_provider
+    action :grant
+end
+
 
 # installing package
 # downloading it direclty because it can't be added to repository index
 provisioners = search(:node, "roles:provisioner-server")
 provisioner = provisioners[0] if provisioners
 os_token="#{node[:platform]}-#{node[:platform_version]}"
-repo_url = provisioner[:provisioner][:repositories][os_token][@cookbook_name].keys.first.split(' ')[1]
+repo_url = provisioner[:provisioner][:repositories][os_token][:inteltxt].keys.first.split(' ')[1]
 
 pkg_name = "OAT-Appraiser-Base-OATapp-1.0.0-2.x86_64.deb"
 pkg_path = "/root/#{pkg_name}"
@@ -89,7 +107,7 @@ end
 
 [ "oat_db.MySQL", "init.sql" ].each do |f|
   execute "create_tables_for_oat" do
-    command "mysql -u #{node[:inteltxt][:db][:user]} -p#{node[:inteltxt][:db][:password]} -h #{mysql_address} #{node[:inteltxt][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
+    command "mysql -u #{node[:inteltxt][:db][:user]} -p#{node[:inteltxt][:db][:password]} -h #{sql_address} #{node[:inteltxt][:db][:database]} < /#{inst_name}/OAT_Server_Install/#{f}"
     ignore_failure true
     action :nothing
     subscribes :run, "execute[unzip_OAT_Setup]", :immediately
@@ -144,7 +162,7 @@ webapp_dir = "/usr/share/oat-appraiser/webapps"
       :db_user => node[:inteltxt][:db][:user],
       :db_pass => node[:inteltxt][:db][:password],
       :db_name => node[:inteltxt][:db][:database],
-      :mysql_host => mysql_address
+      :mysql_host => sql_address
     })
   end
   execute "link_service_#{webapp}" do
@@ -268,7 +286,7 @@ template "/var/www/OAT/includes/dbconnect.php" do
     :db_user => node[:inteltxt][:db][:user],
     :db_pass => node[:inteltxt][:db][:password],
     :db_name => node[:inteltxt][:db][:database],
-    :db_host => mysql_address
+    :db_host => sql_address
   )
   notifies :restart, "service[apache2]"  
 end
@@ -300,7 +318,7 @@ bash "prepare_agent" do
   EOH
   action :run
   subscribes :run, "bash[deploy_his_portal]", :immediately
-  not_if { File.exists? "/var/www/OAT/ClientInstallForLinux.zip" }
+  not_if { File.exists? "/var/www/OAT/ClientInstallForLinux.zip" and node[:inteltxt][:server][:client_package_ready] }
   only_if { File.exists? "/var/lib/oat-appraiser/ClientFiles/PrivacyCA.cer" }
   only_if { File.exists? "/var/lib/oat-appraiser/ClientFiles/TrustStore.jks" }
 end

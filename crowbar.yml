@@ -30,7 +30,7 @@ barclamp:
   version: 0
   requires:
     - @crowbar
-    - mysql
+    - database
   member:
     - openstack
   os_support:
@@ -101,6 +101,10 @@ locale_additions:
           alert_mail_user: User
           alert_mail_pass: Password
           apache_listen_port: OAT HIS portal port
-          mysql_instance: MySQL
+          database_instance: Database
       oat_edit_deployment:
         deployment: Deployment
+
+git:
+  date: Tue Jun 11 09:59:01 2013 +0000
+  commit: 8415967e1bd629f305a2ab2ee6f60ad970b77fcf

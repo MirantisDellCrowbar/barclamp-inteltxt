@@ -34,10 +34,11 @@ OAT_status(){
                         echo $"OAT (pid $pid) is running..."
                 else
                         echo $"OAT is stopped"
+                        return 1
                 fi
         else
                 echo $"OAT is stopped"
-                return $1
+                return 1
         fi
 }
 

@@ -6,8 +6,8 @@
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-node.set_unless['inteltxt']['db']['password'] = secure_password
-node.set_unless['inteltxt']['password'] = secure_password
+node.set_unless['oat']['db']['password'] = secure_password
+node.set_unless['oat']['password'] = secure_password
 
 Chef::Log.info("Configuring OAT to use MySQL backend")
 
