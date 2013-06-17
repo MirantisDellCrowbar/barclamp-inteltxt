@@ -22,7 +22,7 @@ begin
   nodes = query.search('node', 'roles:oat-client').first.collect{|node| node[:fqdn].split('.').first} rescue []
 
   # create connection object
-  url = "http#{"s"if server[:oat][:server][:secure]}://#{server[:fqdn]}:#{server[:oat][:server][:port]}"
+  url = "http#{"s"if server[:inteltxt][:server][:secure]}://#{server[:fqdn]}:#{server[:inteltxt][:server][:port]}"
   uri = URI.parse(url)
   connection = Net::HTTP.new(uri.host, uri.port)
   if uri.scheme == "https"
